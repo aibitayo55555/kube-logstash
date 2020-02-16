@@ -31,7 +31,6 @@ jobs:
               docker tag $IMAGE_NAME:$TAG_NAME quay.io/$IMAGE_NAME:$TAG_NAME
               docker push quay.io/$IMAGE_NAME:$TAG_NAME
 
-
 workflows:
   version: 2.1
   build-master:
