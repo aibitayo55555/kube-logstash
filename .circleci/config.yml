@@ -1,8 +1,49 @@
-version: 2
+version: 2.1
 jobs:
- build:
-   machine: true
-   steps:
-     - checkout
-     # build the application image
-     - run: docker build -t logstash-test:$CIRCLE_BRANCH .
+  build:
+    environment:
+      IMAGE_NAME: aibitayo55555/logstash-test
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: docker build -t $IMAGE_NAME:latest .
+
+  build_tag:
+      environment:
+        IMAGE_NAME: aibitayo55555/logstash-test
+        TAG_NAME: v0.1
+      docker:
+        - image: docker:18.06.3-dind
+      steps:
+        - checkout
+        - setup_remote_docker
+        - run:
+            name: Build image
+            command: docker build -t $IMAGE_NAME:$TAG_NAME .
+        - run:
+            name: Push image tag
+            command: |
+              docker login quay.io --username $QUAY_USERNAME --password $QUAY_PASSWORD
+              docker tag $IMAGE_NAME:$TAG_NAME quay.io/$IMAGE_NAME:$TAG_NAME
+              docker push quay.io/$IMAGE_NAME:$TAG_NAME
+
+
+workflows:
+  version: 2.1
+  build-master:
+    jobs:
+      - build_latest
+
+  build_tag:
+    jobs:
+      - build_tag:
+          filters:
+            branches:
+              only:
+                - master
+            tags:
+              only: /.*/
