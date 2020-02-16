@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  build_latest:
     environment:
       IMAGE_NAME: aibitayo55555/logstash-test
     docker:
